@@ -62,7 +62,7 @@ app.post('/diarios/new', function (req, res) {
     if(err) {
       return console.error('error fetching client from pool', err);
     }
-    client.query('select fn_grava_diario('
+    client.query('insert into diario values('
           + req.body.id + ',' 
           + req.body.id_usuario + ',' 
           + req.body.id_veiculo + ','
@@ -70,7 +70,7 @@ app.post('/diarios/new', function (req, res) {
           + '\'' + req.body.hinicio + '\'' + ','
           + '\'' + req.body.hfim + '\'' + ','
           + '\'' + req.body.obs + '\'' + ','
-          + req.body.status  +', \'I\');', function(err, result) {
+          + req.body.status + ');', function(err, result) {
       done();
       if(err) {
         return console.error('error running query', err);
