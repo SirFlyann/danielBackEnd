@@ -19,120 +19,6 @@ var config = {
 
 var pool = new pg.Pool(config);
 
-// rota com protocolo GET para seleção no banco de dados
-app.get('/consulta', function (req, res) {
-
-  // to run a query we can acquire a client from the pool, 
-  // run a query on the client, and then return the client to the pool 
-  pool.connect(function(err, client, done) {
-    if(err) {
-      return console.error('error fetching client from pool', err);
-    }
-    client.query('SELECT * from produtos order by codigo', 
-        function(err, result) {
-          //call `done()` to release the client back to the pool 
-          done();
-
-          if(err) {
-            return console.error('error running query', err);
-          }
-          res.setHeader('Access-Control-Allow-Origin','*');
-          console.log(result.rows);
-          res.json(result.rows); // servidor retorna a consulta em formato json
-
-        });
-  });
-});
-
-// rota com protocolo POST para inserção no banco de dados
-app.post('/insere', function (req, res) {
-
-  // to run a query we can acquire a client from the pool, 
-  // run a query on the client, and then return the client to the pool 
-  //var registro = {codigo:'4', nome:'medalha', qtde:'100', valor: '5.0'};
-  pool.connect(function(err, client, done) {
-    if(err) {
-      return console.error('error fetching client from pool', err);
-    }
-    client.query('insert into produtos (codigo, nome, qtde, valor) values (' + req.body.codigo + 
-          ', \'' + req.body.nome + '\', ' + req.body.qtde + ',' + req.body.valor + ')', function(err, result) {
-            //call `done()` to release the client back to the pool 
-            done();
-
-            if(err) {
-              return console.error('error running query', err);
-            }
-
-            res.setHeader('Access-Control-Allow-Origin','*');
-            res.json(result.rows); // servidor retorna a consulta em formato json
-          });
-        });
-    });
-
-// rota com protocolo DELETE para remoção no banco de dados
-app.delete('/remove/:codigo', function (req, res) {
-
-  // to run a query we can acquire a client from the pool, 
-  // run a query on the client, and then return the client to the pool 
-  var codigo = req.params.codigo
-    pool.connect(function(err, client, done) {
-      if(err) {
-        return console.error('error fetching client from pool', err);
-      }
-      client.query('delete from produtos where codigo = ' + 
-          codigo, function(err, result) {
-            //call `done()` to release the client back to the pool 
-            done();
-
-            if(err) {
-              return console.error('error running query', err);
-            }
-
-            res.setHeader('Access-Control-Allow-Origin','*');
-            res.json(result.rows); // servidor retorna a consulta em formato json
-          });
-    });
-});
-
-// rota com protocolo PUT para atualização no banco de dados
-app.put('/atualiza', function (req, res) {
-
-  pool.connect(function(err, client, done) {
-    if(err) {
-      return console.error('error fetching client from pool', err);
-    }
-    client.query('update produtos set nome = \'' + 
-        req.body.nome + '\', qtde = ' + req.body.qtde + 
-        ', valor = ' + req.body.valor + ' where codigo = '+
-        req.body.codigo , function(err, result) {
-          //call `done()` to release the client back to the pool 
-          done();
-
-          if(err) {
-            return console.error('error running query', err);
-          }
-          res.setHeader('Access-Control-Allow-Origin','*');
-          res.json(result.rows); // servidor retorna a consulta em formato json
-        });
-  });
-});
-
-// Login
-app.post('/login', function (req, res) {
-  pool.connect(function(err, client, done) {
-    if(err) {
-      return console.error('error fetching client from pool', err);
-    }
-    client.query('select id from usuario where usuario=\'' + req.body.usuario + '\' and senha=\'' + req.body.senha +'\';', function(err, result) {
-      done();
-      if(err) {
-        return console.error('error running query', err);
-      }
-      res.setHeader('Access-Control-Allow-Origin','*');
-      res.json(result.rows);
-    });
-  });
-});
 
 //CRUD de Diário
 app.get('/diarios/all', function (req, res) {
@@ -181,9 +67,9 @@ app.post('/diarios/new', function (req, res) {
           + req.body.id_usuario + ',' 
           + req.body.id_veiculo + ','
           + req.body.id_atividade  + ','
-          + req.body.hinicio  + ','
-          + req.body.hfim  + ','
-          + req.body.obs  + ','
+          + '\'' + req.body.hinicio + '\'' + ','
+          + '\'' + req.body.hfim + '\'' + ','
+          + '\'' + req.body.obs + '\'' + ','
           + req.body.status  +', \'I\');', function(err, result) {
       done();
       if(err) {
@@ -200,15 +86,14 @@ app.put('/diarios/update', function (req, res) {
     if(err) {
       return console.error('error fetching client from pool', err);
     }
-    client.query('select fn_grava_diario('
-          + req.body.id + ',' 
-          + req.body.id_usuario + ',' 
-          + req.body.id_veiculo + ','
-          + req.body.id_atividade  + ','
-          + req.body.hinicio  + ','
-          + req.body.hfim  + ','
-          + req.body.obs  + ','
-          + req.body.status  +', \'A\');', function(err, result) {
+    client.query('update diario set '
+          + 'id_usuario = ' + req.body.id_usuario + ', ' 
+          + 'id_veiculo = ' + req.body.id_veiculo + ', '
+          + 'id_atividade = ' + req.body.id_atividade  + ', '
+          + 'hinicio = ' + '\'' + req.body.hinicio + '\'' + ', '
+          + 'hfim = ' + '\'' + req.body.hfim + '\'' + ', '
+          + 'obs = ' + '\'' + req.body.obs + '\'' + ', '
+          + 'status = ' + req.body.status  +' where id = ' + req.body.id + ';', function(err, result) {
           done();
           if(err) {
             return console.error('error running query', err);
@@ -225,15 +110,7 @@ app.delete('/diarios/remove/:codigo', function (req, res) {
       if(err) {
         return console.error('error fetching client from pool', err);
       }
-    client.query('select fn_grava_diario('
-          + req.body.id + ',' 
-          + req.body.id_usuario + ',' 
-          + req.body.id_veiculo + ','
-          + req.body.id_atividade  + ','
-          + req.body.hinicio  + ','
-          + req.body.hfim  + ','
-          + req.body.obs  + ','
-          + req.body.status  +', \'D\');', function(err, result) {
+    client.query('delete from diario where id = ' + req.body.id + ';', function(err, result) {
             done();
             if(err) {
               return console.error('error running query', err);
