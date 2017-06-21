@@ -4,6 +4,8 @@ var bodyParser = require('body-parser');
 var core_use = require('cors');
 var pg = require('pg');
 
+var port = process.env.PORT || 8080;
+
 app.use(core_use());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -158,4 +160,4 @@ app.get('/viagem', function (req, res) {
         });
   });
 })
-app.listen(3000)
+app.listen(port)
