@@ -9,22 +9,11 @@ var port = process.env.PORT || 8080;
 app.use(core_use());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-var config = {
-  user: 'postgres', //env var: PGUSER 
-  database: 'Node', //env var: PGDATABASE 
-  password: '159asd951', //env var: PGPASSWORD 
-  port: 5432, //env var: PGPORT 
-  max: 10, // max number of clients in the pool 
-  idleTimeoutMillis: 30000, // how long a client is allowed to remain idle before being closed 
-};
-
-var pool = new pg.Pool(config);
-
+var connectionString = 'postgres://xuktzkcpahdhhw:27f2cf8b65bd55646cbab098091e4219bcf610f623b0358ad1a81d5d5fb46565@ec2-23-21-220-48.compute-1.amazonaws.com:5432/d4kkdj9relvk9h';
 
 //CRUD de Diário
 app.get('/diarios/all', function (req, res) {
-  pool.connect(function(err, client, done) {
+  pg.connect(connectionString, function(err,client, done) {
     if(err) {
       return console.error('error fetching client from pool', err);
     }
