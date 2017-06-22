@@ -32,7 +32,7 @@ app.get('/diarios/all', function (req, res) {
 
 app.get('/diarios/:id', function (req, res) {
   var id = req.params.id;
-  pool.connect(function(err, client, done) {
+  pg.connect(connectionString, function(err,client, done) {
     if(err) {
       return console.error('error fetching client from pool', err);
     }
@@ -49,7 +49,7 @@ app.get('/diarios/:id', function (req, res) {
 });
 
 app.post('/diarios/new', function (req, res) {
-  pool.connect(function(err, client, done) {
+  pg.connect(connectionString, function(err,client, done) {
     if(err) {
       return console.error('error fetching client from pool', err);
     }
@@ -73,18 +73,18 @@ app.post('/diarios/new', function (req, res) {
 });
 
 app.put('/diarios/update', function (req, res) {
-  pool.connect(function(err, client, done) {
+  pg.connect(connectionString, function(err,client, done) {
     if(err) {
       return console.error('error fetching client from pool', err);
     }
     client.query('update diario set '
-          + 'id_usuario = ' + req.body.id_usuario + ', ' 
-          + 'id_veiculo = ' + req.body.id_veiculo + ', '
-          + 'id_atividade = ' + req.body.id_atividade  + ', '
-          + 'hinicio = ' + '\'' + req.body.hinicio + '\'' + ', '
-          + 'hfim = ' + '\'' + req.body.hfim + '\'' + ', '
-          + 'obs = ' + '\'' + req.body.obs + '\'' + ', '
-          + 'status = ' + req.body.status  +' where id = ' + req.body.id + ';', function(err, result) {
+        + 'id_usuario = ' + req.body.id_usuario + ', ' 
+        + 'id_veiculo = ' + req.body.id_veiculo + ', '
+        + 'id_atividade = ' + req.body.id_atividade  + ', '
+        + 'hinicio = ' + '\'' + req.body.hinicio + '\'' + ', '
+        + 'hfim = ' + '\'' + req.body.hfim + '\'' + ', '
+        + 'obs = ' + '\'' + req.body.obs + '\'' + ', '
+        + 'status = ' + req.body.status  +' where id = ' + req.body.id + ';', function(err, result) {
           done();
           if(err) {
             return console.error('error running query', err);
@@ -97,24 +97,24 @@ app.put('/diarios/update', function (req, res) {
 
 app.delete('/diarios/remove/:codigo', function (req, res) {
   var codigo = req.params.codigo
-    pool.connect(function(err, client, done) {
+    pg.connect(connectionString, function(err,client, done) {
       if(err) {
         return console.error('error fetching client from pool', err);
       }
-    client.query('delete from diario where id = ' + req.body.id + ';', function(err, result) {
-            done();
-            if(err) {
-              return console.error('error running query', err);
-            }
-            res.setHeader('Access-Control-Allow-Origin','*');
-            res.json('Deletado com sucesso!');
-          });
+      client.query('delete from diario where id = ' + req.body.id + ';', function(err, result) {
+        done();
+        if(err) {
+          return console.error('error running query', err);
+        }
+        res.setHeader('Access-Control-Allow-Origin','*');
+        res.json('Deletado com sucesso!');
+      });
     });
 });
 
 //Dropdown
 app.get('/dropdown', function (req, res) {
-  pool.connect(function(err, client, done) {
+  pg.connect(connectionString, function(err,client, done) {
     if(err) {
       return console.error('error fetching client from pool', err);
     }
@@ -133,7 +133,7 @@ app.get('/dropdown', function (req, res) {
 
 // Dados da viagem
 app.get('/viagem', function (req, res) {
-  pool.connect(function(err, client, done) {
+  pg.connect(connectionString, function(err,client, done) {
     if(err) {
       return console.error('error fetching client from pool', err);
     }
