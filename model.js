@@ -17,7 +17,7 @@ app.get('/diarios/all', function (req, res) {
     if(err) {
       return console.error('error fetching client from pool', err);
     }
-    client.query('SELECT * from diario where status = 1;', 
+    client.query('SELECT * from diario;', 
         function(err, result) {
           done();
           if(err) {
@@ -53,21 +53,26 @@ app.post('/diarios/new', function (req, res) {
     if(err) {
       return console.error('error fetching client from pool', err);
     }
-    client.query('insert into diario values('
-          + req.body.id + ',' 
-          + req.body.id_usuario + ',' 
-          + req.body.id_veiculo + ','
-          + req.body.id_atividade  + ','
-          + '\'' + req.body.hinicio + '\'' + ','
-          + '\'' + req.body.hfim + '\'' + ','
-          + '\'' + req.body.obs + '\'' + ','
-          + req.body.status + ');', function(err, result) {
+    client.query('select id from atividades where descricao = \'' + req.body.id + '\';', function(err, result) {
       done();
       if(err) {
         return console.error('error running query', err);
+      } else {
+        client.query('insert into diario(ID_USUARIO,ID_VEICULO,ID_ATIVIDADE,HINICIO,HFIM,OBS)  values('
+              + 1 + ','
+              + 1 + ','
+              + result.rows[0].id + ','
+              + '\'' + req.body.inicio + '\'' + ','
+              + '\'' + req.body.fim + '\'' + ','
+              + '\'' + req.body.obs + '\'' + ');', function(err, result) {
+          done();
+          if(err) {
+            return console.error('error running query', err);
+          }
+          res.setHeader('Access-Control-Allow-Origin','*');
+          res.json('Inserido com sucesso!');
+        });
       }
-      res.setHeader('Access-Control-Allow-Origin','*');
-      res.json('Inserido com sucesso!');
     });
   });
 });
